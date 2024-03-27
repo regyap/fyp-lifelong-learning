@@ -1,0 +1,25 @@
+.container {
+    width: 100px !important;
+    height: 100%;
+
+}
+
+.dropzone {
+    width: 10px;
+}
+
+.dru-dropzone {
+    overflow: hidden;
+}
+
+.image-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 10px;
+}
+
+.uploaded-image {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+}

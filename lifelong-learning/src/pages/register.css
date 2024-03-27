@@ -1,0 +1,33 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+
+}
+
+body,
+html {
+    width: 100%;
+    min-height: 100%;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+
+.outer {
+    background-image: url(https://patkay.com/cdn/shop/articles/The-Hive-NTU-Pat-Kay-Away.jpg?v=1608345310);
+    height: 100vh;
+    width: 100vw;
+    background-size: cover;
+    /* Cover the entire area of .outer */
+    background-repeat: no-repeat;
+    /* Do not repeat the image */
+    background-position: center;
+    /* Center the image */
+
+}
+
+.register {
+    background-color: white;
+}

@@ -1,0 +1,45 @@
+.formboxclasswhole {
+    display: flex;
+    flex-direction: row;
+
+}
+
+.formboxclass {
+    display: flex;
+    flex-direction: column;
+    width: 80%;
+    margin: 5%;
+    background-color: black;
+
+
+}
+
+.formbox {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+
+}
+
+.flexinputs {
+    display: flex;
+    flex-direction: column;
+    padding: 11px;
+
+}
+
+.flexinputs input[type="text"] {
+    background-color: black;
+    color: white;
+    padding: 8px 10px;
+    border: none;
+    border-radius: 5px;
+    margin: 10px 0;
+    font-size: 20px;
+}
+
+.flexinputs button {
+    background-color: black;
+    color: white;
+    border: 1px white solid;
+}
