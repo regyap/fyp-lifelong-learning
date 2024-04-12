@@ -1,6 +1,6 @@
 import React from "react";
 import TopBar from "../Components/TopBar/TopBar.jsx";
-import EditProfile from "../Components/EditProfile/EditProfile.jsx";
+// import EditProfile from "../Components/EditProfile/EditProfile.jsx";
 
 
 export default function EditProfilePage() {
@@ -10,7 +10,8 @@ export default function EditProfilePage() {
         <>
 
             <TopBar />
-            <EditProfile></EditProfile>
+            {/* <EditProfile></EditProfile> */}
+
 
 
         </>

@@ -1,0 +1,154 @@
+/* Global box-sizing for consistent sizing */
+
+/* Ensure the root and body take up at least the viewport height */
+
+
+.body {
+    width: 100vw;
+    min-height: 0vh !important;
+    background-color: black;
+    font-size: 15px;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-weight: 10;
+
+
+
+}
+
+.analybody {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    margin: 0;
+    width: 99vw;
+    /* height: 10vh; */
+    overflow-x: hidden;
+    overflow-y: hidden;
+    background-color: #000000;
+
+
+}
+
+
+.feedback-container {
+    /* margin: 20px 0; */
+    /* padding: 10px; */
+    background-color: #000000;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-size: 13px;
+    height: auto;
+}
+
+.feedback-item {
+    padding: 15px;
+    margin-bottom: 20px;
+    /* Increased bottom margin */
+    background-color: rgb(255, 255, 255);
+    border-radius: 5px;
+    border-left: 5px solid #007bff;
+    /* Solid left border for a hint of color */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    /* Soft shadow for depth */
+}
+
+.feedback-item:last-child {
+    margin-bottom: 100px;
+}
+
+.feedback-item h3 {
+    margin-top: -15px;
+    /* Pull title upwards */
+    margin-bottom: 15px;
+    /* Space before the description */
+    background-color: #007bff;
+    /* Blue background for the title */
+    color: white;
+    /* White text for contrast */
+    font-size: 1.2em;
+    /* Slightly larger font size */
+    font-weight: 700;
+    /* Bold */
+    padding: 8px 15px;
+    /* Padding inside the title bar */
+    border-radius: 5px 5px 0 0;
+    /* Rounded corners on the top */
+    display: inline-block;
+    /* Allows the background to fit the text */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    /* Shadow for depth */
+}
+
+.feedback-item p {
+    margin: 0;
+    padding: 0 5px;
+    /* Padding for the description text */
+    line-height: 1.6;
+    color: #000000;
+    /* Dark grey for readability */
+}
+
+/* Add hover effect for interaction feedback */
+.feedback-item:hover {
+    transform: translateY(-2px);
+    /* Slightly raise the card */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    /* Enhance shadow */
+}
+
+@media (max-width: 768px) {
+    .feedback-item h3 {
+        font-size: 1em;
+        /* Adjust title size for smaller screens */
+    }
+}
+
+
+
+
+
+
+/* snapshot */
+/* Add or modify these styles in your analyzer.css */
+
+.snapshot-container-a {
+    background-color: black;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    flex-direction: column;
+    /* Center the images horizontally */
+    gap: 20px;
+    /* Space between images */
+    margin-bottom: 400px;
+    /* overflow-y: auto; */
+    /* height: 100vh; */
+    /* overflow-y: auto; */
+}
+
+.snapshot-item-a {
+    flex: 1;
+    min-width: 250px;
+    /* Minimum width of each image container */
+    max-width: 100%;
+    /* Ensure it doesn't grow beyond the container width */
+
+}
+
+.snapshot-image-a {
+    width: 100%;
+    /* Make image expand to fill the container */
+    max-width: 100%;
+    /* Ensure it doesn't exceed its container */
+    height: auto;
+    /* Maintain aspect ratio */
+    border-radius: 8px;
+    /* Optional: rounds the corners for a softer look */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    /* Optional: adds a subtle shadow for depth */
+}
+
+select,
+option {
+    color: black !important;
+}

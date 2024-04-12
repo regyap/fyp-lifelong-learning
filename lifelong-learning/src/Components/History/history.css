@@ -14,7 +14,7 @@
     height: 42px;
 
     border-bottom: 1px solid white;
-    background-color: #2F2D3A;
+    background-color: #392898;
     padding: 10px 30px;
     /* padding-bottom: 30px; */
     text-align: left;
@@ -26,12 +26,13 @@
 
 .content {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    grid-template-columns: repeat(1, minmax(150px, 1fr));
     /* grid-gap: 5px; */
     padding-top: 5px;
     background-color: black;
 
     overflow-y: scroll;
+    max-height: 500px;
 
     border-radius: 0px 0px 15px 15px;
 }
@@ -43,6 +44,10 @@
     font-family: "Outfit", sans-serif;
     font-size: 13px;
     padding: 5px 30px;
+}
+
+.contentdate {
+    font-size: 11px;
 }
 
 .content-item-titlearea {

@@ -1,8 +1,10 @@
 import React, { useEffect, require, useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import "./login.css";
 import axios from "axios";
 import logo from "../images/logoblack.png";
+
+import { toast } from 'react-toastify';
 
 function Login() {
     // if login already, then redirect to welcome page
@@ -18,6 +20,16 @@ function Login() {
     useEffect(() => {
         clearUserSessions();
     }, []);
+
+    const [successMessage, setSuccessMessage] = useState('');
+    const location = useLocation();
+
+    useEffect(() => {
+        if (location.state && location.state.successMessage) {
+            setSuccessMessage(location.state.successMessage);
+            toast.success(location.state.successMessage);
+        }
+    }, [location.state]);
 
     const validateEmail = (email) => {
         var re = /^[a-zA-Z0-9]+(?:[.][a-zA-Z0-9]+)?@[a-zA-Z]{1,}(?:.[a-zA-Z]+){0,2}.[a-zA-Z]{2,3}$/;
@@ -46,7 +58,6 @@ function Login() {
         } else {
             if (domain === "") {
                 setError("Please select a domain");
-                setDomain("Student");
 
             }
             setError(null); //clear error message if there are no errors
@@ -64,14 +75,20 @@ function Login() {
                     (response) => {
                         console.log(response);
                         if (response.status === 404 || response.data.message === "User does not exist" || response.data.message === "Email and domain are required") {
-                            setError(<p>Email does not exist. Please <a href="/signup">sign up</a>.</p>);
+                            setError(<p>Email does not exist. Please <a href="/register">register</a>.</p>);
+                        }
+                        else if (response.data.emailInput !== "" && response.data.domainInput !== "" && response.data.message === "Incorrect domain for the email") {
+                            setError("Incorrect domain for the email");
                         }
 
-                        else if (response.data.emailInput !== "" && response.data.domainInput !== "" && response.data.message === "Success email check") {
+                        else if (response.data.message === "Success email check") {
                             console.log(response);
                             localStorage.setItem('userEmail', email);
                             localStorage.setItem('userDomain', domain);
                             navigate('/login2');
+                        }
+                        else if (response.status === 500) {
+                            setError("Internal server error, please contact your admin");
                         }
 
                     }
@@ -97,7 +114,7 @@ function Login() {
                     <img src={logo} alt="profile" className="profile" />
                 </div><br /><br />
 
-                <p><b className="headbold">Sign In</b><br />Use your NTU email account<br /> or create one <a href="signup"> here</a></p>
+                <p><b className="headbold">Sign In</b><br />Use your NTU email account<br /> or create one <a href="register    "> here</a></p>
 
 
 
@@ -120,7 +137,7 @@ function Login() {
                         <select id="domain" name="domain" value={domain} onChange={setdomainentry}>
 
                             <option value="Student">Student</option>
-                            <option value="Recruit">Recruit</option>
+                            <option value="Recruiter">Recruiter</option>
 
                         </select>
                     </div>

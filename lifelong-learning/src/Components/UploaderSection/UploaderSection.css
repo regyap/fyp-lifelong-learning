@@ -1,11 +1,18 @@
 .container {
-    width: 100px !important;
-    height: 100%;
+    /* width: 100px !important;
+    height: 100%; */
+    /* width: 500px; */
+
+}
+
+.container {
+    font-size: 13px;
+    color: white;
 
 }
 
 .dropzone {
-    width: 10px;
+    width: 100px;
 }
 
 .dru-dropzone {

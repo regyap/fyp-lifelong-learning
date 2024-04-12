@@ -67,7 +67,7 @@ function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
 }
 
-export default function Example() {
+export default function Calendar() {
     let today = startOfToday()
     let [selectedDay, setSelectedDay] = useState(today)
     let [currentMonth, setCurrentMonth] = useState(format(today, 'MMM-yyyy')) //may-2022
@@ -75,6 +75,9 @@ export default function Example() {
     console.log(firstDayCurrentMonth)
 
 
+
+    const [events, setEvents] = useState([]);
+    const accessToken = localStorage.getItem('accessToken');
 
 
 
@@ -102,6 +105,23 @@ export default function Example() {
     let upcomingMeetings = meetings.filter((meeting) => {
         return isFuture(parseISO(meeting.startDatetime))
     });
+    const formattedEvents = events.map(event => {
+        return {
+            id: event.event_id,
+            title: event.event_name,
+            start: new Date(event.event_date),
+            end: new Date(event.event_date), // Adjust if your event has a separate end date
+            description: event.event_description,
+            location: event.event_location
+        };
+    });
+
+    function handleEventSelect(eventId) {
+        // Find the selected event from the events prop
+        const selectedEvent = events.find(event => event.event_id === eventId);
+        console.log(selectedEvent);
+        // Additional logic for handling the selected event
+    }
 
 
     return (
@@ -109,7 +129,7 @@ export default function Example() {
 
             <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.css" rel="stylesheet" />
 
-            <div className="max-w-md px-4 mx-auto sm:px-7 md:max-w-4xl md:px-6 bg-white p-4 ">
+            <div className="max-w-md px-4 mx-auto sm:px-7 md:max-w-4xl md:px-6 bg-gray-100 border p-4 rounded-lg">
                 <div className="md:grid md:grid-cols-2 md:divide-x md:divide-gray-200">
                     <div className="md:pr-14">
                         <div className="flex items-center">

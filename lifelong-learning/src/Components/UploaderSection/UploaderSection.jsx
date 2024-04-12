@@ -93,7 +93,7 @@ const UploaderSection = ({ accessToken, onFileUpload, uploadedFiles, setUploaded
 
     return (
         <>
-            <div className="container">
+            <div className="container w-auto">
                 <Dropzone
                     // getUploadParams={getUploadParams}
                     onChangeStatus={handleChangeStatus}

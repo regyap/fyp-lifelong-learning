@@ -1,0 +1,71 @@
+form .similarity-details .similarity-title{
+    padding:0 10px;
+}
+
+form .similarity-details .category{
+    display:flex;
+    width: 80%;
+    padding:0 15px;
+    margin: 14px 0;
+    justify-content:space-between;
+}
+
+.similarity-details .category label{
+    display:flex;
+    align-items:center;
+    font-size:12px;
+}
+
+.similarity-details .category .opt{
+    height: 18px;
+    width:18px;
+    background:#d9d9d9;
+    border-radius: 50%;
+    margin-right:10px;
+    border: 5px solid transparent;
+    margin:auto;
+}
+
+.dot{
+    display:flex;
+    flex-direction:column;
+    padding: 0 8px;
+}
+
+#opt1:checked ~ .category label .one,
+#opt2:checked ~ .category label .two,
+#opt3:checked ~ .category label .three,
+#opt4:checked ~ .category label .four,
+#opt5:checked ~ .category label .five{
+    border-color:#d9d9d9;
+    background: black;
+}
+
+form input[type="radio"]{
+    display:none;
+}
+
+.employment-container{
+    display:flex;
+    flex-direction:column;
+    padding:0 10px;
+}
+
+.input-box3{
+    display:flex;
+    flex-direction:row;
+    justify-content: space-between;
+    font-size: 12px;
+    padding:0 15px;
+    margin: 14px 0;
+}
+
+.employment-type{
+    display:flex;
+    flex-direction:row;
+}
+
+.employment-type label {
+    margin-left:3px;
+}
+

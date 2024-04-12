@@ -1,11 +1,13 @@
 import React from 'react';
 import Card from 'react-bootstrap/Card';
+import ProgressBar from '@ramonak/react-progress-bar';
+
 
 const JobCard = ({ job, handleJobClick, onApply }) => {
     console.log("JobCard job:", job);
     return (
         <Card
-            className="mb-4 shadow-lg bg-gray-700 text-white cursor-pointer "
+            className="mb-4 shadow-lg bg-gray-700 text-white cursor-pointer pl-2 pr-2 pt-2 pb-2"
             onClick={() => handleJobClick(job.id)}
         >
             <Card.Body>
@@ -41,6 +43,11 @@ const JobCard = ({ job, handleJobClick, onApply }) => {
                     <div className="text-sm">
                         <span className="font-semibold">Closing Date:</span> {job.closingdate}
                     </div>
+                </div>
+
+                <div className="pt-2 pb-2">
+                    Skill Compatibality
+                    <ProgressBar completed={job.match_percentage} bgColor="#4caf50" labelColor="#fff" />
                 </div>
             </Card.Body>
         </Card>

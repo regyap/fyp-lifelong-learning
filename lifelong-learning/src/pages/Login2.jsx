@@ -19,13 +19,6 @@ function Login2() {
         console.log(storedEmail)
         console.log(storedDomain)
 
-
-
-        // const storedEmail = "regineyap1609@gmail.com"
-        // const storedDomain = "Student"
-        // P@ssw0rd
-
-
         setEmail(storedEmail || "");
         setDomain(storedDomain || "Student");
     }, []);
@@ -43,12 +36,12 @@ function Login2() {
 
     const handleSubmit = (event) => {
         event.preventDefault(); // Prevents the default form submit action
-        login2(); // Call your login function here
+        login2();
     };
 
     const [email, setEmail] = useState("");
     const [error, setError] = useState(null);
-    const [domain, setDomain] = useState("Student");
+    const [domain, setDomain] = useState("");
     const [loading, setLoading] = useState(false); // Added loading state
     const [password, setPassword] = useState("");
     const history = useNavigate();
@@ -79,11 +72,16 @@ function Login2() {
                         console.log(response);
                         console.log(response.data);
                         localStorage.setItem('userEmail', email);
+                        console.log(email);
                         localStorage.setItem('userDomain', domain);
                         localStorage.setItem('accessToken', response.data.access_token);
                         localStorage.setItem('refreshToken', response.data.refresh_token);
 
-                        history("/welcome");
+                        if (domain === "Student") {
+                            history("/welcome");
+                        } else {
+                            history("/dashboard");
+                        }
                     }
 
                     else {

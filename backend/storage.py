@@ -1,0 +1,49 @@
+import pyrebase
+from firebase_admin import storage, credentials, initialize_app
+import json
+
+# config = {
+#     "apiKey": "AIzaSyAxpHIeCD8TuJq3sXl0tZ5BRU4vLz0aE_A",
+#     "authDomain": "aija-fyp.firebaseapp.com",
+#     "projectId": "aija-fyp",
+#     "storageBucket": "aija-fyp.appspot.com",
+#     "messagingSenderId": "352366658959",
+#     "appId": "1:352366658959:web:58632730c5182ca745b7fa",
+#     "databaseURL": "https://firebaseio.com/",
+# }
+
+# config = {
+#     "type": "service_account",
+#     "project_id": "aija-fyp",
+#     "private_key_id": "b1c77cd4469323901481bfdd1ed59f3d2342543b",
+#     "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCcunrS68w+IC4M\nThqT9Kry+Op4CD4Ny5MSez4LtZx3aINPdCV6vOllYZPa3VEXrlgWNt1agx19qptU\nmIhqTcWnoYyCmaYv3sho2a8q3mdB9ZAHEzKB8hid4Fn3ILQm4Ax3UNVDDTRM6VBm\ndevXVOb5vNuO3ejZ2FgZWcxlCAvZTgXP+76A5PYF429bWtdg1Rw2vDgBDpuZqQmf\no6wI5U3lcMQqvkBJsx5WypmyseX0NoZxhhwxIr3SW/QUQr+sAl64hc2AxoPnI5PI\nkg0wrf3AnIxH+2TjXcr7oUMosxedLxahf6ENCC8ajxtB+jT0AkZDPEHQGXv1pUx4\njr1MnsyTAgMBAAECggEAArOtFfr33Jy3aBtMlmWVMN0dRamp6cwrO+buAEutAXRg\nY+7cdCVsX9GmN+BK22RBCbKZorIFJyGmARGKgH9yVQ9FTQpGQcFocqfi2JO+848l\nLX0/CKhz+vzFvRHn3FroCOjwbdh9B1QAwKA8MZkgGW9DcoIQcPj4ajxD3sk1uXt5\nv1CzQ3U6oZwJ/aGaE4lLMIepGx6kfPeTN/Vy3aR0NvfCITfwRIiCXNSoxF46s43n\nw9AVamcWcZT7iScPEQJ8Yvef+RrS1gpj+aHlC+PyKBWWgJod40SIzARO7di45c/d\nz12KsJgWqenH+/r7vLl7D4NPaxjQsaXjdXCRsUsRoQKBgQDJyXynVPome0IZHeAf\njRJNtbkETT4sY7x7uEmh0Ia8+B9u1D1+acSj57cj4k3LZWZGTs/FzuadAzs7qn2t\nIRVPagWLLkplSlJ7twDCMWmNGM/csUbmrzHX2QqCt6SCP+zZ3p2zymIcddQoziKm\nlczij9n3Jqy546118WHt+PYoEQKBgQDG1fNKQQ9Fcxgo86iOJhwwqCfbHFQgQ9J/\n9flfIAGydQztP46DrrjBR3adr/1aR0FWLbal8TBhXwF4QgcBZaPq8yNH0lO1pGD5\nbbpg1/qEIp+Na+AdF2PP1/jU4+FqDi/4JJk5f9UlFmCEHMs/lM/4wJP5uQGsnt1w\nWk3cotZuYwKBgAzGUbryOUf4Y63dY1P8BV2gFI9+KGJ9CfC3MQoqfm02NB87Fo2L\nOqS5xbFi4VPwHnJzCNpYB+eGzdgwKfas8oFtj95I1vLkqqYkZsrkf+8r0/T/0CJI\nkxo8JlsyLxsD2wXL/yXjuSReHUlcC3uKXkc1njH0Y9j83f1qg62iJktRAoGBAI2V\nzg9C8qfmg/6tOoo2Mv6mzvKkYnczNFJwCemlte+oj9Lk3guAwAjJZXp11jeR48GE\n/bl+XJAJgddrVOe2w5lLFwVOjNMcQP18GCpbwQSUTv76IPU2MZnP1V1rA5lsjtXo\n4b7i+xjUrVeF1WjqA4nDP9uj1MBhw5b8htMklQK3AoGBALT5BzY+HzeclvHOy+W6\nmr96mJqNBbamn9EC51+RfLccz5NFh292JYVzAeIAJ8S639ive5s789TLIavjrU8e\nBe6B/zMaIUMMU0lMpAyzjD/ZpfkwtyMm1pQ5+zLXTYKqLdFT5l4+rxK03ff5vDYO\nDycHZV1uXcHUzbCtcboNXmG5\n-----END PRIVATE KEY-----\n",
+#     "client_email": "firebase-adminsdk-ldack@aija-fyp.iam.gserviceaccount.com",
+#     "client_id": "115693780122906300382",
+#     "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+#     "token_uri": "https://oauth2.googleapis.com/token",
+#     "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+#     "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-ldack%40aija-fyp.iam.gserviceaccount.com",
+#     "universe_domain": "googleapis.com",
+# }
+
+f = open("credentials.json", "r")
+data = json.loads(f.read())
+
+# firebase = pyrebase.initialize_app(config)
+cred = credentials.Certificate(data)
+initialize_app(cred, {"storageBucket": "aija-fyp.appspot.com"})
+# storage = firebase.storage()
+my_image = "./documents/resumes/logoblack.png"
+
+filename = my_image.split("/")[-1]
+
+# Upload Image
+# storage.child(my_image).put(my_image)
+bucket = storage.bucket()
+blob = bucket.blob("resumes/" + filename)
+blob.upload_from_filename(my_image)
+
+blob.make_public()
+
+
+print(blob.public_url)

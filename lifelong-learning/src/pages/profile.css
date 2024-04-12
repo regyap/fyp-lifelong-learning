@@ -1,0 +1,163 @@
+.body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Montserrat;
+  color: white;
+
+  display: flex;
+  flex-direction: column;
+  max-height: 100vh;
+  justify-content: center;
+  background-color: rgb(0, 0, 0);
+  align-items: center;
+
+  margin-left: auto;
+  margin-right: auto;
+
+  width: 100vw;
+  font-size: 13px;
+
+  background-color: #000;
+
+
+}
+
+
+
+.resume-profile {
+  padding: 5px 22vw;
+  font-size: 33px;
+  font-weight: 700;
+  position: relative;
+}
+
+.resume-profile::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 2px;
+  width: 100%;
+  background: #ffffff;
+}
+
+.container {
+  max-width: 50% !important;
+  width: 50% !important;
+
+
+  /* margin: 12px 0;
+    padding: 0 30px; */
+  border-radius: 5px;
+
+}
+
+
+.container form .user-details {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+form .user-details .input-box {
+  margin: 0 0 10px 0;
+  padding: 0 10px;
+
+
+  width: 100%;
+}
+
+.input-container {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.input-box2 {
+  width: 48%;
+  margin: 0 0 10px 0;
+  padding: 0 10px;
+}
+
+.user-details input {
+  height: 35px;
+  width: 100%;
+  outline: none;
+  border-radius: 5px;
+  border: 1px solid #ffffff;
+  padding-left: 12px;
+  font-size: 16px;
+  color: black;
+  transition: all 0.3s ease;
+}
+
+.details {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.user-details input:focus,
+.user-details input:valid {
+  border-color: #5072A7;
+}
+
+input[type="text"] {
+  color: white;
+}
+
+form .profilebutton input[type="submit"] {
+  height: 45px;
+  width: 100%;
+  margin: 20px 0;
+  outline: none;
+  color: #cccccc;
+  border: none;
+  font-size: 18px;
+  font-weight: 500;
+  border-radius: 5px;
+  letter-spacing: 1px;
+  background: rgb(29, 99, 156);
+
+  cursor: pointer;
+}
+
+form .profilebutton input:hover {
+  background: rgb(57, 57, 57);
+}
+
+input[type="text"] {
+  background-color: white;
+  color: black
+}
+
+.email {
+  background-color: dimgray !important;
+
+}
+
+@media (max-width: 584px) {
+  .container {
+    max-width: 100%;
+  }
+
+  form .user-details .input-box,
+  form .user-details .input-box2 {
+    margin-bottom: 15px;
+    width: 100%;
+  }
+
+  form .gender-details .category {
+    width: 100%;
+  }
+
+  .container form .user-details {
+    max-height: 300px;
+    overflow-y: scroll;
+  }
+
+  .user-details::-webkit-scrollbar {
+    width: 0;
+  }
+}
