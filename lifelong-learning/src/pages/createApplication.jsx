@@ -6,7 +6,7 @@ import './createapplication.css';
 import JobCard from '../Components/JobCardNoSkill/JobCardNoSkill'; // Import JobCard
 import axios from 'axios'; // Assuming axios is used for API calls
 
-Modal.setAppElement('#root'); // This binds your modal to your application
+
 
 function createApplication() {
     const [modalIsOpen, setModalIsOpen] = useState(false);
