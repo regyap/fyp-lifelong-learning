@@ -63,13 +63,23 @@ class DomainType(Enum):
 
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, supports_credentials=True)
 app.secret_key = "68ea6a6ea2bb49c2b9d078604479ef4d"
 
 
 # postgres connection
 db_config = load_config()
 conn = psycopg2.connect(**db_config)
+
+# DATABASE_URI = "postgres://postgresql:46QFpRNpMtbi3hcuILnugH9RPGXle26o@dpg-coejlo8l5elc738a70n0-a.singapore-postgres.render.com/aija"
+# DATABASE_URI = os.environ.get("DATABASE_URI")
+# def connect_to_db():
+#     try:
+#         connection = psycopg2.connect(DATABASE_URI)
+#         return connection
+#     except (Exception, Error) as error:
+#         print("Error while connecting to PostgreSQL", error)
+#         return None
 
 
 def connect_to_db():
@@ -506,7 +516,10 @@ def getDocumentFromFirestore():
         return jsonify({"error": "Failed to retrieve document from Firestore"}), 500
 
 
-def extract_text_from_pdf(file_location):
+import re  # Import regular expression module
+
+
+def extract_text_from_pdfv(file_location):
     """
     Extract text from a PDF file at the given location.
     """
@@ -515,9 +528,38 @@ def extract_text_from_pdf(file_location):
         for page in pdf.pages:
             text = page.extract_text()
             if text:  # Only add if text extraction was successful
+                # Normalize text to prevent concatenation of words
+                text = normalize_text(text)
+                print(text)
+                # Preprocess text to handle other issues
+                text = preprocess_text(text)
                 text_content.append(text)
     combined_text = "\n".join(text_content)
     return combined_text
+
+
+def preprocess_text(text):
+    """
+    Preprocess extracted text to improve readability and prevent concatenation.
+    """
+    # Add space after non-alphanumeric characters and before uppercase letters
+    text = re.sub(r"(?<=[^\w\s])", " ", text)
+    # Normalize whitespace
+    text = re.sub(r"\s+", " ", text)
+    # Remove leading and trailing whitespace
+    text = text.strip()
+    return text
+
+
+def normalize_text(text):
+    """
+    Normalize text by adding spaces between concatenated words based on certain rules.
+    """
+    # Add space between words if one word ends with a lowercase letter and the next word starts with an uppercase letter
+    text = re.sub(r"(\w)([A-Z])", r"\1 \2", text)
+    # Add space between words if one word ends with a lowercase letter or a digit and the next word starts with a digit
+    text = re.sub(r"(\w|\d)(\d)", r"\1 \2", text)
+    return text
 
 
 from keybert import KeyBERT
@@ -585,7 +627,7 @@ def store_resume():
             temp_file.write(pdf_content)
             temp_file_path = temp_file.name  # Get the path to the temporary file
 
-        extracted_text = extract_text_from_pdf(temp_file_path)
+        extracted_text = extract_text_from_pdfv(temp_file_path)
         os.remove(temp_file_path)
 
         # Extract keywords from the extracted text
@@ -595,7 +637,7 @@ def store_resume():
             keyphrase_ngram_range=(1, 3),
             stop_words="english",
             highlight=False,
-            top_n=10,
+            top_n=20,
         )
 
         # Extracted skills from keywords
@@ -603,16 +645,16 @@ def store_resume():
         print(extracted_skills)
 
         # Separate words in the extracted skills
-        separated_skills = []
-        for skill in extracted_skills:
-            # Split the skill on whitespace and punctuation
-            words = re.findall(r"\w+", skill)
-            # Tokenize each word to handle compound words
-            tokenized_words = [word for word in words if word.isalpha()]
-            separated_skills.extend(tokenized_words)
+        # separated_skills = []
+        # for skill in extracted_skills:
+        #     # Split the skill on whitespace and punctuation
+        #     words = re.findall(r"\w+", skill)
+        #     # Tokenize each word to handle compound words
+        #     tokenized_words = [word for word in words if word.isalpha()]
+        #     separated_skills.extend(tokenized_words)
 
         # Insert extracted skills into the database
-        for skill in separated_skills:
+        for skill in extracted_skills:
             cursor.execute(
                 "INSERT INTO skills (userid, resumeid, skillname, skilltype) VALUES (%s, %s, %s, %s)",
                 (
@@ -709,17 +751,18 @@ def get_applications():
         JOIN 
             resume r ON afj.resumeID = r.resumeID
         JOIN 
-            users u ON r.userID = u.userID
+            users u ON r.userid = u.userid
         JOIN 
             companyJobPostings cj ON afj.jobPostingID = cj.jobPostingID
         JOIN 
             companies c ON cj.companyid = c.companyID
         WHERE 
-            u.userID = %s;
+            r.userid = %s;
         """,
                 (user_id,),
             )
             applications = cursor.fetchall()
+            print("submitted applications: ", applications)
             cursor.close()
             connection.close()
 
@@ -744,6 +787,9 @@ def get_applications():
     except (Exception, Error) as error:
         print("Error fetching applications or identity:", error)
         return jsonify({"error": "Failed to fetch applications"}), 500
+
+
+import psycopg2
 
 
 def calculate_match_percentage(resume_id, job_id):
@@ -777,10 +823,14 @@ def calculate_match_percentage(resume_id, job_id):
     job_skills = cur.fetchall()
     job_skill_set = {skill[0].lower() for skill in job_skills}  # Normalize to lowercase
 
-    # Calculate match percentage
-    matched_skills = resume_skill_set.intersection(job_skill_set)
+    # Match skills using %LIKE and calculate match percentage
+    matched_skills_count = sum(
+        1
+        for skill in job_skill_set
+        if any(skill in resume_skill for resume_skill in resume_skill_set)
+    )
     match_percentage = (
-        (len(matched_skills) / len(job_skill_set) * 100) if job_skill_set else 0
+        (matched_skills_count / len(job_skill_set)) * 100 if job_skill_set else 0
     )
 
     cur.close()
@@ -1282,7 +1332,8 @@ def generate_feedback_for_input_resume_gpt(
          - Measurable Results: Highlight achievements with measurable results.
          - Typos: Check for any spelling or grammatical errors.
          - Consistency: Ensure consistent formatting and language throughout the resume.
-         - Give Examples: Provide specific examples or suggestions for improvement like " Your resume has this ".." It will be good if you can change to this "..", while referencing what we have in the current resume, 
+         - Give Examples: Provide specific examples or suggestions for improvement like
+         " Your resume has this ".." It will be good if you can change to this "..", while referencing what we have in the current resume, 
            reference the section to change too by the way. This is not needed always.. only when you see something that needs change .
          - Please. everything should be what is in the input resume. do
         - dont give me - **Feedback**: 
@@ -1361,7 +1412,10 @@ def summarize_text(prompt):
     system_msg = (
         "You are a helpful assistant who is great at summarizing large amounts of text."
     )
-    user_msg = "Summarize and analyse on the good points the following text: " + prompt
+    user_msg = (
+        "Summarize and analyse on the good points in the resumes, eg They are using good keywords. Use your own judgement on why it is good: "
+        + prompt
+    )
 
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",
@@ -1723,19 +1777,18 @@ def get_matching_jobs(resume_id):
 #     return jsonify(matches)
 
 
-@app.route("/recruiter/applications", methods=["GET"])
+@app.route("/recruiter-applications", methods=["GET"])
+@jwt_required()
 def get_recruiter_applications():
     # Connect to the database
+    current_user_id = get_jwt_identity()
+
     conn = connect_to_db()
     cursor = conn.cursor()
     cursor.execute(
         """
     SELECT 
-        afj.applicationid, 
-        afj.applicationtime, 
-        afj.status, 
-        afj.resumeid, 
-        afj.jobpostingid, 
+        cjp.jobpostingid, 
         cjp.jobpostingtitle, 
         cjp.jobpostingposition, 
         cjp.jobpostingdescription, 
@@ -1743,71 +1796,232 @@ def get_recruiter_applications():
         cjp.salary, 
         cjp.applicationclosingdate, 
         comp.companyname, 
-        comp.companylocation
+        comp.companylocation,
+        COUNT(afj.applicationid) AS application_count
     FROM 
-        applicationForJob afj
+        companyJobPostings AS cjp
     INNER JOIN 
-        companyJobPostings cjp ON afj.jobpostingid = cjp.jobpostingid
+        companies AS comp ON cjp.companyid = comp.companyid
+    LEFT JOIN 
+        applicationForJob AS afj ON cjp.jobpostingid = afj.jobpostingid
     INNER JOIN
-        companies comp ON cjp.companyid = comp.companyid;
-    """
+        users AS u ON u.companyid = cjp.companyid
+    WHERE
+        u.userid = %s
+    GROUP BY
+        cjp.jobpostingid, 
+        cjp.jobpostingtitle, 
+        cjp.jobpostingposition, 
+        cjp.jobpostingdescription, 
+        cjp.companyid, 
+        cjp.salary, 
+        cjp.applicationclosingdate, 
+        comp.companyname, 
+        comp.companylocation;
+
+    """,
+        (current_user_id,),
     )
     applications = cursor.fetchall()
+    print(applications)
     cursor.close()
     conn.close()
 
     # Format the data for JSON response
     applications_list = []
     for app in applications:
+        application_count = (
+            app[9] if len(app) > 9 else 0
+        )  # Corrected index for application_count
         applications_list.append(
             {
-                "applicationId": app[0],
-                "applicationTime": app[1],
-                "status": app[2],
-                "resumeId": app[3],
-                "jobPostingId": app[4],
-                "jobPostingTitle": app[5],
-                "jobPostingPosition": app[6],
-                "jobPostingDescription": app[7],
-                "companyId": app[8],
-                "salary": app[9],
-                "applicationClosingDate": app[10],
-                "companyName": app[11],
-                "companyLocation": app[12],
+                "jobPostingId": app[0],
+                "jobPostingTitle": app[1],
+                "jobPostingPosition": app[2],
+                "jobpostingdescription": app[3],
+                "companyid": app[4],
+                "salary": app[5],  # Corrected index for salary
+                "applicationclosingdate": app[
+                    6
+                ],  # Corrected index for applicationclosingdate
+                "companyname": app[7],  # Corrected index for companyName
+                "companylocation": app[8],  # Corrected index for companyLocation
+                "applicationCount": application_count,
             }
         )
+
+    print(applications_list)
     return jsonify(applications_list)
 
 
-# recruiter_id = request.args.get("rec  ruiter_id")
-# if not recruiter_id:
-#     return jsonify({"error": "Recruiter ID is required"}), 400
+import datetime
 
-# try:
-#     conn = get_db_connection()
-#     cur = conn.cursor()
-#     cur.execute("""
-#         SELECT jobpostingid, jobpostingtitle, jobpostingdescription, salary
-#         FROM companyJobPostings
-#         WHERE recruiterID = %s;
-#     """, (recruiter_id,))
-#     job_listings = cur.fetchall()
-#     cur.close()
-#     conn.close()
 
-#     listings = [
-#         {
-#             "jobId": job[0],
-#             "title": job[1],
-#             "description": job[2],
-#             "salary": job[3]
-#         }
-#         for job in job_listings
-#     ]
-#     return jsonify(listings)
-# except Exception as e:
-#     print(f"Database query failed: {e}")
-#     return jsonify({"error": "Failed to fetch listings"}), 500
+@app.route("/recruiter/jobsfetch", methods=["GET"])
+def get_jobs_recruiter():
+    try:
+        connection = connect_to_db()
+        cursor = connection.cursor()
+
+        # Query to fetch jobs with application closing date greater than today, sorted by upload date
+        query = """
+        SELECT job.jobpostingid, job.jobpostingtitle, job.jobpostingposition, job.jobpostingdescription,
+               job.companyID, job.salary, job.applicationclosingdate,
+               companies.companyname, companies.companylocation, job.uploaddate
+        FROM companyJobPostings AS job
+        INNER JOIN companies ON job.companyID = companies.companyid
+        WHERE job.applicationclosingdate > CURRENT_DATE
+        ORDER BY job.uploaddate ASC  
+        """
+        cursor.execute(query)
+        jobs = cursor.fetchall()
+
+        job_data = [
+            {
+                "id": job[0],
+                "title": job[1],
+                "position": job[2],
+                "description": job[3],
+                "companyID": job[4],
+                "salary": job[5],
+                "closingdate": job[6].isoformat() if job[6] else None,
+                "companyname": job[7],
+                "location": job[8],
+                "uploaddate": job[9].isoformat() if job[9] else None,
+            }
+            for job in jobs
+        ]
+
+        return jsonify(job_data)
+    except Exception as e:
+        print(f"Error fetching jobs: {e}")
+        return jsonify({"error": "Failed to fetch jobs"}), 500
+    finally:
+        if cursor:
+            cursor.close()
+        if connection:
+            connection.close()
+
+
+@app.route("/recruiter/jobscreate", methods=["POST"])
+@jwt_required()
+def create_job():
+    current_user_id = get_jwt_identity()
+    data = request.json
+    try:
+        connection = connect_to_db()
+        cursor = connection.cursor()
+
+        # Fetch the company ID associated with the current user
+        cursor.execute(
+            "SELECT companyid FROM users WHERE userid = %s", (current_user_id,)
+        )
+        company_id = cursor.fetchone()
+        if not company_id:
+            return jsonify({"error": "Company not found for the user"}), 404
+
+        # Insert new job posting
+        query = """
+            INSERT INTO companyJobPostings (
+            jobpostingtitle, jobpostingposition, jobpostingdescription,
+            companyID, salary, applicationclosingdate, uploaddate)
+            VALUES (%s, %s, %s, %s, %s, %s, NOW())
+        """
+        cursor.execute(
+            query,
+            (
+                data["title"],
+                data["position"],
+                data["description"],
+                company_id[0],
+                data["salary"],
+                data["closingDate"],
+            ),
+        )
+        connection.commit()
+
+        jobpostingid = cursor.lastrowid  # Get the ID of the last inserted row
+        print(jobpostingid)
+        return (
+            jsonify(
+                {"message": "Job created successfully", "jobpostingid": jobpostingid}
+            ),
+            200,
+        )
+
+    except Exception as e:
+        connection.rollback()  # Rollback the transaction on error
+        return jsonify({"error": str(e)}), 500
+
+    finally:
+        cursor.close()
+        connection.close()
+
+    # Flask API endpoint
+
+
+@app.route("/recruiter-applicants-view/<int:job_id>")
+def get_applicants(job_id):
+    try:
+        # Establish connection to the database
+        connection = connect_to_db()
+
+        # Create a cursor object
+        cursor = connection.cursor()
+
+        # Fetch applicants for the specified job ID from the database
+        cursor.execute(
+            f"SELECT u.first_name, u.last_name, u.email, r.resumename, r.uploaddate, r.file_location FROM applicationforjob a "
+            f"JOIN resume r ON a.resumeid = r.resumeid "
+            f"JOIN users u ON r.userid = u.userid "
+            f"WHERE a.jobpostingid = {job_id}"
+        )
+
+        # Fetch all rows
+        applicants_data = cursor.fetchall()
+        print(applicants_data)
+
+        # Close the cursor and connection
+        cursor.close()
+        connection.close()
+
+        # Convert fetched data into a list of dictionaries
+        applicants = []
+        for row in applicants_data:
+            applicant = {
+                "name": f"{row[0]} {row[1]}",
+                "email": row[2],
+                "resume_name": row[3],
+                "upload_date": row[4].isoformat(),
+                "resume_location": row[5],
+            }
+            applicants.append(applicant)
+
+        # Return the applicants data as JSON
+        return jsonify(applicants)
+
+    except psycopg2.Error as e:
+        print(f"Error fetching applicants: {e}")
+        return jsonify({"error": "Failed to fetch applicants"}), 500
+
+
+from google.cloud import storage
+
+
+def generate_signed_url(bucket_name, blob_name, expiration=3600):
+    """
+    Generate a signed URL for the specified blob with the given expiration time (in seconds).
+    """
+    storage_client = storage.Client()
+    bucket = storage_client.bucket(bucket_name)
+    blob = bucket.blob(blob_name)
+
+    # Generate the signed URL
+    signed_url = blob.generate_signed_url(
+        version="v4", expiration=expiration, method="GET"
+    )
+
+    return signed_url
 
 
 if __name__ == "__main__":
