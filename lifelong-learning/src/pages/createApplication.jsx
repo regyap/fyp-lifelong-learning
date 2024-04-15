@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Modal from 'react-modal';
 import TopBar from '../Components/TopBar/TopBar';
 import { FaPlusCircle } from 'react-icons/fa'; // Import the plus icon
-import './createApplication.css';
+import './createapplication.css';
 import JobCard from '../Components/JobCardNoSkill/JobCardNoSkill'; // Import JobCard
 import axios from 'axios'; // Assuming axios is used for API calls
 
