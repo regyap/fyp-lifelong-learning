@@ -5,7 +5,7 @@ import { FaPlusCircle } from 'react-icons/fa'; // Import the plus icon
 
 import JobCard from '../Components/JobCardNoSkill/JobCardNoSkill'; // Import JobCard
 import axios from 'axios'; // Assuming axios is used for API calls
-// import './createapplication.css';
+import './createapplication.css';
 
 
 
