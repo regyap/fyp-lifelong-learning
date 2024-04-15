@@ -1,41 +1,57 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom'; // Import useHistory hook
 import "./recruiterapplication.css";
+import { MdRemoveRedEye } from "react-icons/md";
+import { FaTrashCan } from "react-icons/fa6";
+import { FaEdit } from "react-icons/fa";
 
 const RecruiterApplication = ({ listings }) => {
+    const navigate = useNavigate(); // Initialize useHistory hook
 
-    // Fetch and display applicant details for a job
-    const viewApplicants = async (jobId) => {
+    // Function to navigate to the applicant view page
+    const viewApplicants = (jobId) => {
         try {
-            // Here you can implement the functionality to view applicants for a job
-            console.log(`Viewing applicants for job ID: ${jobId}`);
-            // This could open a modal or navigate to a new page with the applicant details
+            // Navigate to the applicant view page
+            navigate(`/recruiterapplicationview/${jobId}`);
         } catch (error) {
-            console.error('Error fetching applicant details:', error);
+            console.error('Error navigating to applicant view page:', error);
         }
     };
 
     return (
         <>
-            <div className="dashboardpage">
-                <div className="dashboardrecruiter">
-                    <div className="submittedappbox bg-black">
-                        <div className="title bg-black text-white">
+            <div className="rappdashboardpage">
+                <div className="rappdashboardrecruiter">
+                    <div className="rappsubmittedappbox bg-black">
+                        <div className="rapptitle text-white">
                             Your Job Listings
                         </div>
-                        <div className="content bg-black">
-                            {listings.map((listing) => (
-                                <div key={listing.jobId} className="content-item">
-                                    <div className="content-item-titlearea">
-                                        <p className="contenttitle">{listing.company} - {listing.title}</p>
+                        <div className="rappcontent bg-black">
+                            {listings.map((listing, index) => (
+                                <div key={index} className="rappcontent-item">
+                                    <div className="rappcontent-item-titlearea">
+                                        <p className="contenttitle">{listing.jobPostingTitle}</p>
                                     </div>
-                                    <div className="content-item-position">
-                                        <div className="contentposition">Applications: {listing.applicationsCount}</div>
-                                        <button className="view-applicants-btn" onClick={() => viewApplicants(listing.jobId)}>
-                                            View Applicants
-                                        </button>
+                                    <div className="rappcontent-item-position">
+                                        <div className="rappcontentposition">Applications: {listing.applicationCount}</div>
+                                        <div className="rappcontentposition">Salary: {listing.salary}</div>
+                                        <div className="rappcontentposition">Closing Date: {listing.applicationclosingdate}</div>
+                                        <div className="rappbutton-group">
+                                            <button className="rappview-applicants-btn" onClick={() => viewApplicants(listing.jobPostingId)}>
+                                                <MdRemoveRedEye />
+                                            </button>
+                                            <button className="rappview-applicants-btn">
+                                                <FaTrashCan />
+                                            </button>
+                                            <button className="rappview-applicants-btn">
+                                                <FaEdit />
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             ))}
+                        </div>
+                        <div className="rapptitlebottom bg-black text-white">
                         </div>
                     </div>
                 </div>

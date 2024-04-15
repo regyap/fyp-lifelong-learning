@@ -20,6 +20,8 @@ import RoleAccess from "../RoleAccess.jsx";
 import Professional from "./pages/Profession.jsx";
 
 import { AuthProvider } from "../src/auth/AuthContext.jsx";
+import CreateApplication from "./pages/createApplication.jsx";
+import RecruiterApplicantView from "./pages/RecruiterApplicationView.jsx";
 
 function App() {
   // const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -28,6 +30,10 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
+          <Route exact path="/">
+            <Redirect to="/login" />
+          </Route>
+
           <Route path="/login" Component={Login} ></Route>
           <Route path="/login2" Component={LoginPassword}></Route>
           <Route path="/signup" Component={SignUp}></Route>
@@ -43,7 +49,8 @@ function App() {
 
           <Route element={<RoleAccess roles={["Recruiter"]} />}>
             <Route path="/dashboard" Component={Dashboard}></Route>
-            <Route path="/createapplication" Component={CreateAppllication}></Route>
+            <Route path="/createapplication" Component={CreateApplication}></Route>
+            <Route path="/recruiterapplicationview/:jobId" Component={RecruiterApplicantView}></Route>
           </Route>
 
           <Route element={<RoleAccess roles={["Student", "Recruiter"]} />}>

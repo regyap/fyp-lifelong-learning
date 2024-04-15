@@ -7,30 +7,29 @@ import axios from 'axios';
 export default function History() {
 
     const [applications, setApplications] = useState([]);
+    const fetchApplications = async () => {
+        try {
+            const token = localStorage.getItem('accessToken'); // Retrieve the token from local storage
+            console.log("before:")
+            console.log(applications)
+            const response = await axios.get('http://127.0.0.1:5000/applications', {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            setApplications(response.data);
+            console.log("after:")
+            console.log(response.data);
+        } catch (error) {
+            console.error('Error fetching applications:', error);
+        }
+    };
 
     useEffect(() => {
-        const fetchApplications = async () => {
-            try {
-                const token = localStorage.getItem('accessToken'); // Retrieve the token from local storage
-                const response = await axios.post(
-                    'http://127.0.0.1:5000/applications',
-                    {},
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`, // Include the token in the headers
-                        },
-                    }
-                );
-                setApplications(response.data);
-                console.log(response.data);
-            } catch (error) {
-                console.error('Error fetching applications:', error);
-            }
-        };
 
         fetchApplications(); // Call fetchApplications when the component mounts
     }, []); // Empty dependency array ensures that the effect runs only once
-
+    useEffect(() => {
+        console.log('Updated applications:', applications);
+    }, [applications]);
 
     return (
         <>

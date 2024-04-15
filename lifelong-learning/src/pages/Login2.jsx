@@ -144,9 +144,9 @@ function Login2() {
                     <img src={logo} alt="profile" className="profile" />
                 </div><br /><br />
 
-                <p><b className="headbold">Sign In two</b><br /></p>
+                {/* <p><b className="headbold">Sign In two</b><br /></p> */}
 
-
+                <br></br>
 
                 <div>
 

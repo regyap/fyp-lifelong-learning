@@ -1,0 +1,120 @@
+.rappdashboardpage {
+    width: 97.28vw;
+    /* padding: 20px; */
+    font-size: 13px;
+    font-family: Montserrat;
+}
+
+.rappdashboardrecruiter {
+    display: flex;
+    justify-content: center;
+}
+
+.rappsubmittedappbox {
+    width: 80%;
+    /* Adjust the width as needed */
+    margin-top: 20px;
+    /* padding: 20px; */
+    /* border: 1px solid #ccc; */
+
+}
+
+.rapptitle {
+    font-size: 15px;
+    font-weight: bold;
+    background-color: #0056b3;
+    border-radius: 15px 15px 0px 0px;
+    padding-top: 13px;
+    padding-bottom: 7px;
+    padding-left: 20px;
+    /* height: 35px; */
+
+}
+
+.rappcontent {
+    width: 100%;
+    overflow-y: scroll;
+}
+
+.rappcontent-item {
+    /* margin-bottom: 20px; */
+    /* padding: 10px; */
+    border-bottom: 1px solid #ddd;
+    background-color: black;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: 5px;
+    padding-top: 5px;
+}
+
+
+.rappcontent-item-titlearea {
+    margin-bottom: 10px;
+}
+
+.rappcontenttitle {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.rappcontent-item-position {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.rappcontentposition {
+    font-size: 13px;
+}
+
+.rappview-applicants-btn {
+    padding: 8px 16px;
+    font-size: 14px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.rappview-applicants-btn:hover {
+    background-color: #0056b3;
+}
+
+
+.content-item-position {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+
+
+.view-applicants-btn {
+    padding: 8px 16px;
+    font-size: 14px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.view-applicants-btn:hover {
+    background-color: #0056b3;
+}
+
+.rapptitlebottom {
+    background-color: #0056b3;
+    border-radius: 0px 0px 15px 15px;
+    height: 35px;
+}
+
+.rappbutton-group {
+    display: flex;
+}
+
+.rappview-applicants-btn {
+    margin-right: 10px;
+    /* Adjust the margin as needed */
+}

@@ -26,6 +26,8 @@ export default function WelcomePage() {
     const [meetings, setMeetings] = useState([]);
     const [currentMonth, setCurrentMonth] = useState(format(new Date(), 'MMM-yyyy'));
 
+    const [aalert, setAlert] = useState([]);
+
 
     const handleSnapshotSelect = (resumeId) => {
         setSelectedSnapshot(resumeId);
@@ -49,6 +51,7 @@ export default function WelcomePage() {
             if (response.data) {
                 console.log('File uploaded successfully:', response.data);
 
+                setAlert("File uploaded successfully")
                 alert('File uploaded successfully');
             }
         } catch (error) {
@@ -105,7 +108,7 @@ export default function WelcomePage() {
     useEffect(() => {
         // Call fetchSnapshots when the component mounts
         getDocumentSnapshot();
-    }, [handleFileUpload]); // Empty dependency array ensures this effect only runs once
+    }, [aalert]); // Empty dependency array ensures this effect only runs once
 
 
 
