@@ -1,7 +1,7 @@
 import React from 'react';
 import Card from 'react-bootstrap/Card';
 import ProgressBar from '@ramonak/react-progress-bar';
-import JobCard from '../JobCardNoSkill/JobCardNoSkill.jsx';
+// import JobCard from '../JobCardNoSkill/JobCardNoSkill.jsx';
 import "./jobcardnoskill.css";
 // help
 
