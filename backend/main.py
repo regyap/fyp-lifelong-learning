@@ -178,9 +178,29 @@ def register():
             "INSERT INTO users (email, password, domain) VALUES (%s, %s, %s)",
             (user_data["email"], user_data["password"], user_data["domain"]),
         )
-        conn.commit()
 
-        return jsonify({"message": "User registered successfully"}), 201
+        conn.commit()
+        cursor.execute(
+            "SELECT userid FROM users WHERE email = %s", (user_data["email"],)
+        )
+
+        user_id = cursor.fetchone()
+        print("user_id:", user_id)
+        access_token = create_access_token(identity=user_id, expires_delta=False)
+        refresh_token = create_refresh_token(identity=user_id)
+
+        return (
+            jsonify(
+                {
+                    "message": "User registered successfully",
+                    "email": user_data["email"],
+                    "domain": user_data["domain"],
+                    "access_token": access_token,
+                    "refresh_token": refresh_token,
+                }
+            ),
+            201,
+        )
 
     except Error as e:
         print(f"Error: {e}")
@@ -987,6 +1007,258 @@ def submit_application():
         connection.close()
         print(e)
         return jsonify({"error": "Failed to submit application"}), 500
+
+
+@app.route("/addprofile", methods=["POST"])
+@jwt_required()
+def update_profile_lol():
+    user_id = get_jwt_identity()
+    user_id = user_id[0]
+    profile_data = request.get_json()
+    conn = connect_to_db()
+    cursor = conn.cursor()
+
+    print("user_id:", user_id)
+
+    try:
+        cursor.execute(
+            """
+            UPDATE users
+            SET
+                first_name = COALESCE(first_name, %s),
+                last_name = COALESCE(last_name, %s),
+                title = COALESCE(title, %s),
+                phone_number = COALESCE(phone_number, %s),
+                birth_date = COALESCE(birth_date, %s),
+                nationality = COALESCE(nationality, %s),
+                street_number = COALESCE(street_number, %s),
+                city = COALESCE(city, %s),
+                postal_code = COALESCE(postal_code, %s),
+                country = COALESCE(country, %s)
+            WHERE userid = %s;
+        """,
+            (
+                profile_data["first_name"],
+                profile_data["last_name"],
+                profile_data["title"],
+                profile_data["phone_number"],
+                profile_data["birth_date"],
+                profile_data["nationality"],
+                profile_data["street_number"],
+                profile_data["city"],
+                profile_data["postal_code"],
+                profile_data["country"],
+                user_id,
+            ),
+        )
+        conn.commit()
+
+        return jsonify({"message": "Profile updated successfully"}), 200
+    except (Exception, psycopg2.Error) as error:
+        print("Failed to update profile:", error)
+        conn.rollback()
+        return jsonify({"error": "Failed to update profile"}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+
+@app.route("/addprofession", methods=["POST"])
+@jwt_required()
+def add_profession():
+    user_id = get_jwt_identity()  # Fetch the user ID from JWT
+    data = request.get_json()
+
+    # Connect to the database
+    conn = connect_to_db()
+    cursor = conn.cursor()
+
+    try:
+        # Insert or update the user's profession profile
+        cursor.execute(
+            """
+         INSERT INTO profession (industry, similarity, employment_type, userid)
+            VALUES (%s, %s, %s, %s);
+        """,
+            (
+                data["industry"],
+                data["similarity"],
+                data["employmentType"],
+                user_id[0],
+            ),
+        )
+        conn.commit()
+        return jsonify({"message": "Profile updated successfully"}), 200
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"error": str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+
+@app.route("/getresumesfordropdown", methods=["GET"])
+@jwt_required()
+def get_resumes():
+    user_id = get_jwt_identity()
+    conn = connect_to_db()
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            """
+            SELECT resumeid, resumename FROM resume 
+            WHERE userid = %s 
+            ORDER BY uploaddate DESC 
+            LIMIT 6
+        """,
+            (user_id,),
+        )
+        resumes = cursor.fetchall()
+        print(resumes)
+        if resumes:
+            resume_list = [
+                {"resumeid": res[0], "resumename": res[1]} for res in resumes
+            ]
+            return jsonify(resume_list), 200
+        else:
+            return jsonify({"message": "No resumes found"}), 404
+    except Exception as e:
+        print(e)
+        return jsonify({"error": "Database error occurred"}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+
+@app.route("/getskills", methods=["GET"])
+def get_skills():
+    resume_id = request.args.get("resumeid")
+    if not resume_id:
+        return jsonify({"message": "Missing resume ID"}), 400
+    conn = connect_to_db()
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            """
+            SELECT skillname, skilltype, skillsid FROM skills 
+            WHERE resumeid = %s
+        """,
+            (resume_id,),
+        )
+        skills = cursor.fetchall()
+        if skills:
+            skills_list = [
+                {"skillname": skill[0], "skilltype": skill[1], "skillsid": skill[2]}
+                for skill in skills
+            ]
+            return jsonify(skills_list), 200
+        else:
+            return jsonify({"message": "No skills found for the selected resume"}), 404
+    except Exception as e:
+        print(e)
+        return jsonify({"error": "Database error occurred"}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+
+@app.route("/getprofessiondetails", methods=["GET"])
+@jwt_required()
+def get_profession_details():
+    user_id = get_jwt_identity()  # Assuming JWT identity is the user's ID
+    conn = None
+    try:
+        # Establish a connection to the database
+        conn = connect_to_db()
+        cursor = conn.cursor()
+
+        # SQL to fetch profession details
+        cursor.execute(
+            "SELECT industry, similarity, employment_type FROM profession WHERE userid = %s",
+            (user_id,),
+        )
+        result = cursor.fetchone()
+
+        if result:
+            # Constructing the response object
+            profession_info = {
+                "industry": result[0],
+                "similarity": result[1],
+                "employment_type": result[2],
+            }
+            return jsonify(profession_info), 200
+        else:
+            return jsonify({"message": "Profession details not found"}), 404
+
+    except (Exception, psycopg2.Error) as error:
+        print("Error while connecting to PostgreSQL", error)
+        return jsonify({"error": "Service unavailable"}), 503
+
+    finally:
+        if conn:
+            cursor.close()
+            conn.close()
+            print("PostgreSQL connection is closed")
+
+
+@app.route("/updateprofessiondetails", methods=["POST"])
+@jwt_required()
+def update_profession():
+    user_id = get_jwt_identity()
+    data = request.json
+    conn = connect_to_db()
+    cursor = conn.cursor()
+
+    print(date)
+    try:
+        cursor.execute(
+            """
+            UPDATE profession SET
+                industry = %s,
+                similarity = %s,
+                employment_type = %s
+            WHERE userid = %s;
+            """,
+            (data["industry"], data["similarity"], data["employmentType"], user_id),
+        )
+        conn.commit()
+        return jsonify({"message": "Profession updated successfully"}), 200
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"error": str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+
+@app.route("/updateskills", methods=["POST"])
+@jwt_required()
+def update_skills():
+    data = request.json
+    conn = connect_to_db()
+    cursor = conn.cursor()
+    try:
+        # Remove existing skills
+        cursor.execute("DELETE FROM skills WHERE resumeid = %s;", (data["resumeId"],))
+        # Add new skills
+        skills = data["skills"]
+        for skill in skills:
+            cursor.execute(
+                "INSERT INTO skills (resumeid, skillname, skilltype) VALUES (%s, %s, %s);",
+                (
+                    data["resumeId"],
+                    skill["skillname"],
+                    skill.get("skilltype", "unspecified"),
+                ),
+            )
+        conn.commit()
+        return jsonify({"message": "Skills updated successfully"}), 200
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"error": str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
 
 
 @app.route("/editprofile", methods=["POST"])
